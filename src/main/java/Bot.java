@@ -29,18 +29,8 @@ import static org.telegram.abilitybots.api.objects.Privacy.PUBLIC;
 
 public class Bot extends AbilityBot {
 
-    private static String BOT_NAME = "---------";
-    private static String BOT_TOKEN = "------------------";
-    private static String PROXY_HOST = "------------" /* proxy host */;
-    private static Integer PROXY_PORT = 0000000000000 /* proxy port */;
-
-
-    private static HashMap<Integer, String> cache = new HashMap<>();
-
-
     protected Bot(String botToken, String botUsername, DefaultBotOptions botOptions) {
         super(botToken, botUsername, botOptions);
-
     }
 
     public int creatorId() {
@@ -58,36 +48,17 @@ public class Bot extends AbilityBot {
                 .build();
     }
 
-    public static void main(String[] args) {
-
-
-        try {
-            ApiContextInitializer.init();//инициализируем Api
-            TelegramBotsApi telegramBotsApi = new TelegramBotsApi(); //создаем объект Api
-
-            //задаем прокси для бота
-            DefaultBotOptions botOptions = ApiContext.getInstance(DefaultBotOptions.class);
-            botOptions.setProxyHost(PROXY_HOST);
-            botOptions.setProxyPort(PROXY_PORT);
-            // выбираем тип прокси: [HTTP|SOCKS4|SOCKS5] (default: NO_PROXY)
-            botOptions.setProxyType(DefaultBotOptions.ProxyType.SOCKS5);
-
-
-            // Register your newly created AbilityBot
-            Bot bot = new Bot(BOT_TOKEN, BOT_NAME, botOptions);
-
-            //регистрируем бота
-            telegramBotsApi.registerBot(bot);
-
-        } catch (Exception e) {
-            BotLogger.error("BotEngine : There is an exception occurred during Bot initialization.", e);
-
-        }
-    }
 
     @Override
-    public void onUpdateReceived(Update update) {//метод для приема сообщений(для получения обновлений через long pull(очередь ожидающих запросов))
+    public void onUpdateReceived(Update update) {
+
+
+        //метод для приема сообщений(для получения обновлений через long pull(очередь ожидающих запросов))
+
+
+
         WeatherFormat weatherFormat = new WeatherFormat();
+
         Message message = update.getMessage(); //получаем текст сообщения из объекта update
         if (message != null && message.hasText()) {
             switch (message.getText()) {
@@ -95,28 +66,7 @@ public class Bot extends AbilityBot {
                     sendMsg(message, "Hello, i am your personal weatherman!");
                     break;
                 case "Weather":
-
-                    if (message.hasLocation()){
-                        float latitude = message.getLocation().getLatitude();
-                        float longitude = message.getLocation().getLongitude();
-
-                        String msg = " Your location:" +
-                                        "\n latitude is  " + latitude +
-                                        "\n longitude is " + longitude;
-
-                        SendMessage Msg = new SendMessage()
-                                .setChatId(message.getChatId().toString())
-                                .setText(msg);
-                        System.out.println("координаты: "+ latitude+"   "+longitude);
-                        try {
-                            execute(Msg);
-                        } catch (TelegramApiException e) {
-                            e.printStackTrace();
-                        }
-
-                    }
-
-
+                    sendMsg(message, "Введите название города!");
                     System.out.println("Пользователь с ID - " + update.getMessage().getChatId() + " запросил погоду");
                     break;
 
@@ -138,29 +88,23 @@ public class Bot extends AbilityBot {
                     } catch (IOException e) {
                         sendMsg(message, " this city is not found ");
                     }
-
             }
         }
 
-
+        if (message != null && message.hasLocation()) {
+            Location location = message.getLocation();
+            String longiLati = String.format("lat=%.2f&lon=%.2f", location.getLatitude(), location.getLongitude());
+            try {
+                sendMsg(message, "Today : \n"+Weather.getWeather(longiLati,weatherFormat));
+                sendMsg(message, "Tomorrow : \n"+Weather.getWeather1(longiLati,weatherFormat));
+            } catch (IOException e) {
+                sendMsg(message, " your coordinate not response ");
+            }
+            System.out.println("Пользователь с ID - " + update.getMessage().getChatId() + "  отправил свои координаты:  lat= "+ location.getLatitude()+ " & lon= " +location.getLongitude());
+        }
     }
 
 
-    public String locationToSring(Location location) {
-        return String.format("lat=%.2f&lon=%.2f", location.getLatitude(), location.getLongitude());
-    }
-
-
-    private void location(Message message) {
-        Location location = message.getLocation();
-        String formattedLocation = String.format("%.6f,%.6f", location.getLatitude(), location.getLongitude());
-        System.out.println(location.toString());
-    }
-
-    public boolean hadLocation(Message message) {
-        Integer id = message.getFrom().getId();
-        return cache.containsKey(id);
-    }
 
 
     public void sendMsg(Message message, String text) { //метод для отправки сообщений
@@ -174,7 +118,7 @@ public class Bot extends AbilityBot {
             setBottons(sendMessage);
             execute(sendMessage);
         } catch (TelegramApiException e) {
-            e.printStackTrace();
+            System.out.println("Send message exeption");
         }
     }
 
@@ -202,17 +146,15 @@ public class Bot extends AbilityBot {
         keyboardRows.add(keyboardFirstRow);
         keyboardRows.add(keyboardSecondRow);
         replyKeyboardMarkup.setKeyboard(keyboardRows);
-
-
     }
 
     @Override
     public String getBotUsername() {
-        return BOT_NAME;
+        return Main.BOT_NAME;
     }
 
     @Override
     public String getBotToken() {
-        return BOT_TOKEN;
+        return Main.BOT_TOKEN;
     }
 }
