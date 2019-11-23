@@ -27,12 +27,12 @@ import static org.telegram.abilitybots.api.objects.Locality.ALL;
 import static org.telegram.abilitybots.api.objects.Privacy.PUBLIC;
 
 
-public class Main {
+public class MAINCLASS {
 
-    public static String BOT_NAME = "-----------";
-    public static String BOT_TOKEN = "---------------------";
-    public static String PROXY_HOST = "----------" /* proxy host */;
-    public static Integer PROXY_PORT = 000000 /* proxy port */;
+    public static String BOT_NAME = "Weatherman";
+    public static String BOT_TOKEN = "                       ";
+    public static String PROXY_HOST = "                    " /* proxy host */;
+    public static Integer PROXY_PORT =     /* proxy port */;
 
 
     public static void main(String[] args) {
