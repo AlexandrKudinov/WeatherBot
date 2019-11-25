@@ -27,24 +27,24 @@ import java.util.List;
         class Coord {
 
         @SerializedName("lon")
-        private Integer lon;
+        private Float lon;
         @SerializedName("lat")
 
-        private Integer lat;
+        private Float lat;
 
-        public Integer getLon() {
+        public Float getLon() {
             return lon;
         }
 
-        public void setLon(Integer lon) {
+        public void setLon(Float lon) {
             this.lon = lon;
         }
 
-        public Integer getLat() {
+        public Float getLat() {
             return lat;
         }
 
-        public void setLat(Integer lat) {
+        public void setLat(Float lat) {
             this.lat = lat;
         }
 
@@ -58,7 +58,7 @@ import java.util.List;
         @SerializedName("coord")
         private Coord coord;
         @SerializedName("weather")
-        private List weather = null;
+        private List<Weather> weather = null;
         @SerializedName("base")
         private String base;
         @SerializedName("main")
@@ -233,7 +233,17 @@ import java.util.List;
             this.tempMax = tempMax;
         }
 
-    }
+         @Override
+         public String toString() {
+             return "Main{" +
+                     "temp=" + temp +
+                     ", pressure=" + pressure +
+                     ", humidity=" + humidity +
+                     ", tempMin=" + tempMin +
+                     ", tempMax=" + tempMax +
+                     '}';
+         }
+     }
 //-----------------------------------weather.Sys.java-----------------------------------
 
 
