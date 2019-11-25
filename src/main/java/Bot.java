@@ -29,8 +29,11 @@ import static org.telegram.abilitybots.api.objects.Privacy.PUBLIC;
 
 public class Bot extends AbilityBot {
 
+    private String botToken;
+
     protected Bot(String botToken, String botUsername, DefaultBotOptions botOptions) {
         super(botToken, botUsername, botOptions);
+        this.botToken = botToken;
     }
 
     public int creatorId() {
@@ -153,6 +156,6 @@ public class Bot extends AbilityBot {
 
     @Override
     public String getBotToken() {
-        return MAINCLASS.BOT_TOKEN;
+        return botToken;
     }
 }

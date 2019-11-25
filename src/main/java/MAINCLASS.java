@@ -1,42 +1,48 @@
-import org.telegram.abilitybots.api.bot.AbilityBot;
-import org.telegram.abilitybots.api.objects.Ability;
 import org.telegram.telegrambots.ApiContextInitializer;
 import org.telegram.telegrambots.bots.DefaultBotOptions;
 import org.telegram.telegrambots.meta.ApiContext;
 import org.telegram.telegrambots.meta.TelegramBotsApi;
-import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
-import org.telegram.telegrambots.meta.api.objects.Location;
-import org.telegram.telegrambots.meta.api.objects.Message;
-import org.telegram.telegrambots.meta.api.objects.Update;
-import org.telegram.telegrambots.meta.api.objects.User;
-import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
-import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardButton;
-import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
-import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.meta.logging.BotLogger;
 
 
 import java.io.IOException;
-import java.sql.SQLOutput;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Scanner;
+import java.io.InputStream;
+import java.util.*;
 
-import static org.telegram.abilitybots.api.objects.Locality.ALL;
-import static org.telegram.abilitybots.api.objects.Privacy.PUBLIC;
 
 
 public class MAINCLASS {
 
     public static String BOT_NAME = "Weatherman";
-    public static String BOT_TOKEN = "                       ";
-    public static String PROXY_HOST = "                    " /* proxy host */;
-    public static Integer PROXY_PORT =     /* proxy port */;
+    public static String BOT_TOKEN_PROPERTY_NAME = "BOT_TOKEN";
+    public static String PROXY_HOST_PROPERTY_NAME = "PROXY_HOST" /* proxy host */;
+    public static String PROXY_PORT_PROPERTY_NAME = "PROXY_PORT";
+
+    private static class PropertyManager{
+        private int getProxyPort() throws IOException {
+            return Integer.parseInt(readProperty("PROXY_PORT"));
+        }
+
+        private String getProxyHost() throws IOException {
+            return readProperty("PROXY_HOST");
+        }
+
+        private String getBotToken() throws IOException {
+            return readProperty("BOT_TOKEN");
+        }
+
+        private String readProperty(String name) throws IOException {
+            Properties properties = new Properties();
+            InputStream inputStream =
+                    this.getClass().getClassLoader().getResourceAsStream("local.properties");
+            properties.load(inputStream);
+            return properties.getProperty(name);
+        }
+    }
 
 
     public static void main(String[] args) {
-
+        PropertyManager PropertyManager = new PropertyManager();
 
         try {
             ApiContextInitializer.init();//инициализируем Api
@@ -44,14 +50,14 @@ public class MAINCLASS {
 
             //задаем прокси для бота
             DefaultBotOptions botOptions = ApiContext.getInstance(DefaultBotOptions.class);
-            botOptions.setProxyHost(PROXY_HOST);
-            botOptions.setProxyPort(PROXY_PORT);
+            botOptions.setProxyHost(PropertyManager.getProxyHost());
+            botOptions.setProxyPort(PropertyManager.getProxyPort());
             // выбираем тип прокси: [HTTP|SOCKS4|SOCKS5] (default: NO_PROXY)
             botOptions.setProxyType(DefaultBotOptions.ProxyType.SOCKS5);
 
 
             // Register your newly created AbilityBot
-            Bot bot = new Bot(BOT_TOKEN, BOT_NAME, botOptions);
+            Bot bot = new Bot(PropertyManager.getBotToken(), BOT_NAME, botOptions);
 
             //регистрируем бота
             telegramBotsApi.registerBot(bot);
@@ -61,5 +67,4 @@ public class MAINCLASS {
 
         }
     }
-
 }
