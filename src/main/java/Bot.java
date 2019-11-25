@@ -29,8 +29,11 @@ import static org.telegram.abilitybots.api.objects.Privacy.PUBLIC;
 
 public class Bot extends AbilityBot {
 
+    private String botToken;
+
     protected Bot(String botToken, String botUsername, DefaultBotOptions botOptions) {
         super(botToken, botUsername, botOptions);
+        this.botToken = botToken;
     }
 
     public int creatorId() {
@@ -52,10 +55,7 @@ public class Bot extends AbilityBot {
     @Override
     public void onUpdateReceived(Update update) {
 
-
         //метод для приема сообщений(для получения обновлений через long pull(очередь ожидающих запросов))
-
-
 
         WeatherFormat weatherFormat = new WeatherFormat();
 
@@ -83,8 +83,9 @@ public class Bot extends AbilityBot {
                     break;
 
                 default:
+
                     try {
-                        sendMsg(message, Weather.getWeather(message.getText(), weatherFormat));
+                        sendMsg(message, WeatherParse.getWeather(message.getText(), weatherFormat));
                     } catch (IOException e) {
                         sendMsg(message, " this city is not found ");
                     }
@@ -95,8 +96,8 @@ public class Bot extends AbilityBot {
             Location location = message.getLocation();
             String longiLati = String.format("lat=%.2f&lon=%.2f", location.getLatitude(), location.getLongitude());
             try {
-                sendMsg(message, "Today : \n"+Weather.getWeather(longiLati,weatherFormat));
-                sendMsg(message, "Tomorrow : \n"+Weather.getWeather1(longiLati,weatherFormat));
+                sendMsg(message, "Today : \n"+WeatherParse.getWeather(longiLati,weatherFormat));
+                sendMsg(message, "Tomorrow : \n"+WeatherParse.getTomorrowWeather(longiLati,weatherFormat));
             } catch (IOException e) {
                 sendMsg(message, " your coordinate not response ");
             }
@@ -150,11 +151,11 @@ public class Bot extends AbilityBot {
 
     @Override
     public String getBotUsername() {
-        return Main.BOT_NAME;
+        return MAINCLASS.BOT_NAME;
     }
 
     @Override
     public String getBotToken() {
-        return Main.BOT_TOKEN;
+        return botToken;
     }
 }

@@ -1,49 +1,35 @@
+import com.google.gson.Gson;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.MalformedURLException;
+import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.Scanner;
 
-public class Weather {
+public class WeatherParse {
 
     public static String getWeather(String message, WeatherFormat weatherFormat) throws IOException {
-        URL url = new URL("http://api.openweathermap.org/data/2.5/weather?" + message + "&units=metric&appid=                        ");
+        // units=metric!
+        URL url = new URL("http://api.openweathermap.org/data/2.5/weather?" + message + "&appid=TOKEN&units=metric"); // todo token from properties
+        Gson gson = new Gson();
 
-        Scanner in = new Scanner((InputStream) url.getContent());
-        String result = "";
-        while (in.hasNext()) {
-
-            result += in.nextLine();
-
-            JSONObject jsonObject = new JSONObject(result);
-
-            weatherFormat.setName(jsonObject.getString("name"));
-
-            JSONObject main = jsonObject.getJSONObject("main");
-            weatherFormat.setTemp(main.getDouble("temp"));
-            weatherFormat.setHumidity(main.getDouble("humidity"));
-
-            JSONArray jsonArray = jsonObject.getJSONArray("weather");
-            for (int i = 0; i < jsonArray.length(); i++) {
-                JSONObject jsonObject1 = jsonArray.getJSONObject(i);
-                weatherFormat.setIcon((String) jsonObject1.get("icon"));
-                weatherFormat.setMain((String) jsonObject1.get("main"));
-            }
-        }
-        return "City: " + weatherFormat.getName() + "\n" +
-                "Temperature: " + weatherFormat.getTemp() + " C " + "\n" +
-                "Humidity: " + weatherFormat.getHumidity() + " % " + "\n" +
-                "Main: " + weatherFormat.getMain() + "\n" +
-                "http://openweathermap.org/img/wn/" + weatherFormat.getIcon() + ".png";
+        /*
+            url.getContent().toString() it is "sun.net.www.protocol.http.HttpURLConnection$HttpInputStream@305fd85d",
+            NOT JSON!
+         */
+        InputStream inputStream = url.openConnection().getInputStream();
+        ForecastFormat forecastFormat = gson.fromJson(new InputStreamReader(inputStream), ForecastFormat.class);
+        return forecastFormat.getMain().toString();
     }
 
 
-    public static String getWeather1(String message, WeatherFormat weatherFormat) throws IOException {
-        URL url = new URL("http://api.openweathermap.org/data/2.5/forecast/daily?" + message + "&cnt=1&units=metric&appid=               ");
+    public static String getTomorrowWeather(String message, WeatherFormat weatherFormat) throws IOException {
+        URL url = new URL("http://api.openweathermap.org/data/2.5/forecast?" + message + "&cnt=10&appid=            ");
         Scanner in = new Scanner((InputStream) url.getContent());
+
+
         String result = "";
         while (in.hasNext()) {
             result += in.nextLine();
@@ -73,7 +59,11 @@ public class Weather {
                 "Humidity: " + weatherFormat.getHumidity() + " % " + "\n" +
                 "Main: " + weatherFormat.getMain() + "\n" +
                 "http://openweathermap.org/img/wn/" + weatherFormat.getIcon() + ".png";
+
+
     }
+
+
 }
 
 
