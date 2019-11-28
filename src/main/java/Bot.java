@@ -12,7 +12,7 @@ public class Bot extends TelegramLongPollingBot {
     private boolean subscribing = false;
     public static Map<Integer, Subscriber> subscriberMap = SubscribersDB.getSubscriberMap();
 
-    protected Bot(DefaultBotOptions botOptions) {
+    private Bot(DefaultBotOptions botOptions) {
         super(botOptions);
         BotMessage.sendMsgToAllSub();
     }

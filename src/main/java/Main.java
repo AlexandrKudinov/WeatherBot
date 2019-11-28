@@ -64,8 +64,7 @@ public class Main {
             BOT_PROPERTY_NAME = PropertyManager.getBotName();
             API_KEY_PROPERTY_NAME = PropertyManager.getApiKey();
             DB_PATH_PROPERTY_NAME = PropertyManager.getDBPath();
-            Bot bot = new Bot(botOptions);
-            telegramBotsApi.registerBot(bot);
+            telegramBotsApi.registerBot(Bot.getInstance());
         } catch (Exception e) {
             System.out.println("Initialisation Bot exception");
         }
